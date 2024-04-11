@@ -64,7 +64,11 @@ public class CameraMove : MonoBehaviour
 
 	private void HandleCameraMove(Vector2 value)
 	{
-		var move = new Vector3(value.x, value.y, 0) * moveSpeed * Time.deltaTime;
+		var forward = transform.forward;
+		var forwardXZ = new Vector3(forward.x, 0, forward.z).normalized;
+		var moveDirection = new Vector3(value.x, 0, value.y);
+		Debug.Log(moveDirection);
+		var move = moveDirection * moveSpeed * Time.deltaTime;
 		anchor.Translate(move, Space.Self);
 	}
 
@@ -82,18 +86,19 @@ public class CameraMove : MonoBehaviour
 	{
 		if (canRotateXAxis)
 		{
-			transform.RotateAround(anchor.position, new Vector3(-value.y, 0, 0), rotateSpeed * Time.deltaTime);
+			transform.Rotate(new Vector3(-value.y, 0, 0), rotateSpeed * Time.deltaTime);
+			anchor.RotateAround(transform.position, new Vector3(0, value.x, 0), rotateSpeed * Time.deltaTime);
 		}
 	}
 
 	private void HandleRotate(float value)
 	{
-		transform.RotateAround(anchor.position, new Vector3(0, value, 0), rotateSpeed * Time.deltaTime);
+		anchor.RotateAround(transform.position, new Vector3(0, value, 0), rotateSpeed * Time.deltaTime);
 	}
 
 	private void HandleScrollWheel(Vector2 value)
 	{
 		var zoom = new Vector3(0, 0, value.y) * zoomSpeed * Time.deltaTime;
-		anchor.Translate(zoom, Space.Self);
+		transform.Translate(zoom, Space.Self);
 	}
 }
