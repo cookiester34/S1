@@ -1,88 +1,197 @@
-﻿using UnityEngine;
-using UnityEngine.InputSystem;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using UnityEngine;
 
+[RequireComponent(typeof(Camera))]
 public class UnitSelection : InputBehaviour
 {
 	[SerializeField]
 	private float zoomSpeed = 10f;
 	
-	public Unit selectedObject;
-	private Vector3 targetDestination;
-	private float zoomLevel = 5;
+	private Camera mainCamera;
+	private Vector3 mousePosition;
 	private Vector3 rotatedForward;
-
+	private Vector3 mouseSelectionStartPosition;
+	private Vector3 averageUnitPosition;
+	private float zoomLevel = 10;
+	
+	private Mesh debugSpherMesh;
+	private Rect selectionRect;
+	
+	private List<Unit> selectedUnits = new();
+	private List<Unit> previewSelectedUnits = new();
+	
+	public bool HasSelectedUnits => selectedUnits.Count > 0;
+	public bool IsSelecting { get; private set; }
+	
 	private void OnDrawGizmos()
 	{
-		if (selectedObject != null)
+		if (HasSelectedUnits)
 		{
-			Gizmos.color = Color.red;
-			Gizmos.DrawWireSphere(selectedObject.transform.position, 1);
+			foreach (var unit in selectedUnits)
+			{
+				Gizmos.color = Color.red;
+				Gizmos.DrawWireMesh(debugSpherMesh, unit.UnitPosition, Quaternion.identity, Vector3.one);
 				
-			Gizmos.color = Color.green;
-			Gizmos.DrawWireSphere(targetDestination, 1);
+				var unitTargetPosition = unit.UnitPosition + rotatedForward * zoomLevel;
+				
+				Gizmos.color = Color.green;
+				Gizmos.DrawWireMesh(debugSpherMesh, unitTargetPosition, Quaternion.identity, Vector3.one);
+			}
+			
+			Gizmos.color = Color.blue;
+			var scale = Vector3.one * zoomLevel * 2f;
+			Gizmos.DrawWireMesh(debugSpherMesh, averageUnitPosition, Quaternion.identity, scale);
+			
+			Gizmos.color = Color.magenta;
+			var averageTargetPosition = averageUnitPosition + rotatedForward * zoomLevel;
+			Gizmos.DrawWireMesh(debugSpherMesh, averageTargetPosition, Quaternion.identity, Vector3.one);
+		}
+	}
+
+	private void OnGUI()
+	{
+		if (IsSelecting)
+		{
+			var unitBoxSize = new Vector2(10f, 10f);
+			foreach (var unit in previewSelectedUnits)
+			{
+				Vector3 screenPos = unit.LastScreenPosition;
+
+				var unitBoxRect = new Rect(screenPos.x, screenPos.y, unitBoxSize.x, unitBoxSize.y);
+
+				GUI.Box(unitBoxRect, GUIContent.none);
+			}
+			
+			GUI.Box(selectionRect, GUIContent.none);
 		}
 	}
 
 	protected override void OnAwake()
 	{
-			
+		mainCamera = GetComponent<Camera>();
+		var primitive = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+		debugSpherMesh = primitive.GetComponent<MeshFilter>().sharedMesh;
 	}
 
 	protected override void SetupInput()
 	{
-		inputHandler.AddInputAction("LeftClick", HandleLeftClick);
+		inputHandler.AddInputAction("LeftClick", HandleLeftClick, HandleLeftClickUp);
 		inputHandler.AddInputAction("RightClick", HandleRightClick);
 		inputHandler.AddInputAction<Vector2>("ScrollWheel", HandleScrollWheel);
 		inputHandler.AddInputAction<Vector2>("MouseMovement", HandleMouseMovement);
+		inputHandler.AddInputAction<Vector2>("MousePosition", HandleMousePosition);
 	}
 	
 	private void Update()
 	{
-		if (selectedObject != null)
-		{
-			targetDestination = selectedObject.transform.position + rotatedForward * zoomLevel;
-		}
 	}
 	
 	private void HandleMouseMovement(Vector2 value)
 	{
-		if (selectedObject == null) return;
+		if (IsSelecting)
+		{
+			selectionRect = GetSelectionRect(mouseSelectionStartPosition, mousePosition);
 		
-		var rotation = Quaternion.Euler(0, value.x, rotatedForward.x > 0 ? value.y : -value.y);
+			var allUnits = UnitManager.Instance.Units;
+			previewSelectedUnits.Clear();
+			foreach (var unit in allUnits)
+			{
+				var screenPos = unit.CameraPosition(mainCamera);
+				if (selectionRect.Contains(screenPos))
+				{
+					previewSelectedUnits.Add(unit);
+				}
+			}
+		}
+		
+		if (!HasSelectedUnits) return;
+		
+		var rotation = Quaternion.Euler(-value.y, value.x, 0);
 		rotatedForward = rotation * rotatedForward;
-		Debug.Log(rotatedForward);
-
-		targetDestination = selectedObject.transform.position + rotatedForward * zoomLevel;
 	}
 		
 	private void HandleLeftClick()
 	{
-		if (selectedObject != null)
+		IsSelecting = true;
+		mouseSelectionStartPosition = mousePosition;
+
+		if (HasSelectedUnits)
 		{
-			selectedObject.Move(targetDestination);
+			foreach (var unit in selectedUnits)
+			{
+				unit.Move(unit.UnitPosition + rotatedForward * zoomLevel);
+			}
 		}
 		
-		//Select object
-		var ray = Camera.main.ScreenPointToRay(Mouse.current.position.ReadValue());
-		var hit = Physics.Raycast(ray, out var hitInfo);
-		selectedObject = hit ? hitInfo.collider.GetComponent<Unit>() : null;
-			
-		if (selectedObject != null)
-		{
-			var selectedObjectPosition = selectedObject.transform.position;
-			targetDestination = selectedObjectPosition + selectedObject.transform.forward * zoomLevel;
-			rotatedForward = selectedObject.transform.forward;
-		}
+		selectedUnits.Clear();
+		previewSelectedUnits.Clear();
 	}
 
+	private void HandleLeftClickUp()
+	{
+		previewSelectedUnits.Clear();
+		IsSelecting = false;
+		zoomLevel = 10;
+		AreaSelect(mouseSelectionStartPosition, mousePosition);
+
+		if (HasSelectedUnits)
+		{
+			averageUnitPosition = selectedUnits.Select(unit => unit.UnitPosition).Average();
+			rotatedForward = (selectedUnits.Select(unit => unit.Forward).Average() + rotatedForward * zoomLevel).normalized;
+		}
+		else
+		{
+			var ray = mainCamera.ScreenPointToRay(mousePosition);
+			var hit = Physics.Raycast(ray, out var hitInfo);
+			var unit = hit ? hitInfo.collider.GetComponent<Unit>() : null;
+
+			if (unit == null) return;
+			
+			selectedUnits.Add(unit);
+			averageUnitPosition = unit.UnitPosition;
+			rotatedForward = unit.Forward;
+		}
+	}
+	
 	private void HandleRightClick()
 	{
+		IsSelecting = false;
+		selectedUnits.Clear();
+	}
+	
+	private void HandleMousePosition(Vector2 value)
+	{
+		mousePosition = value;
+	}
+
+	private void AreaSelect(Vector3 startPosition, Vector3 endPosition)
+	{
+		selectionRect = GetSelectionRect(startPosition, endPosition);
+		selectedUnits.Clear();
 		
+		var allUnits = UnitManager.Instance.Units;
+		foreach (var unit in allUnits)
+		{
+			var screenPos = unit.CameraPosition(mainCamera);
+			if (selectionRect.Contains(screenPos))
+			{
+				selectedUnits.Add(unit);
+			}
+		}
+	}
+	
+	private Rect GetSelectionRect(Vector3 startPosition, Vector3 endPosition)
+	{
+		var topLeft = Vector3.Min(startPosition, endPosition);
+		var bottomRight = Vector3.Max(startPosition, endPosition);
+		return new Rect(topLeft.x, Screen.height - bottomRight.y, bottomRight.x - topLeft.x, bottomRight.y - topLeft.y);
 	}
 	
 	private void HandleScrollWheel(Vector2 value)
 	{
-		if (selectedObject == null) return;
+		if (!HasSelectedUnits) return;
 		
 		zoomLevel += value.y * zoomSpeed * Time.deltaTime;
 	}

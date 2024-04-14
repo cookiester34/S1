@@ -1,6 +1,4 @@
-using System;
 using UnityEngine;
-using UnityEngine.InputSystem;
 
 [RequireComponent(typeof(UnitSelection))]
 public class CameraMove : InputBehaviour
@@ -15,10 +13,14 @@ public class CameraMove : InputBehaviour
 	private float zoomSpeed = 10f;
 
 	[SerializeField]
+	private float verticalSpeed = 10f;
+	
+	[SerializeField]
 	private Transform anchor;
 
 	private InputHandlerOfType<Vector2> moveHandler;
 	private InputHandlerOfType<float> rotateHandler;
+	private InputHandlerOfType<float> verticalHandler;
 	
 	private bool canRotateXAxis = false;
 	
@@ -38,6 +40,7 @@ public class CameraMove : InputBehaviour
 		
 		inputHandler.AddInputAction<Vector2>("Move", out moveHandler);
 		inputHandler.AddInputAction<float>("Rotate", out rotateHandler);
+		inputHandler.AddInputAction<float>("Vertical", out verticalHandler);
 	}
 
 	private void Update()
@@ -51,15 +54,29 @@ public class CameraMove : InputBehaviour
 		{
 			HandleRotate(rotateHandler.Value);
 		}
+		
+		if (verticalHandler != null)
+		{
+			HandleVertical(verticalHandler.Value);
+		}
 	}
 
 	private void HandleCameraMove(Vector2 value)
 	{
-		var forward = transform.forward;
-		var forwardXZ = new Vector3(forward.x, 0, forward.z).normalized;
 		var moveDirection = new Vector3(value.x, 0, value.y);
 		var move = moveDirection * moveSpeed * Time.deltaTime;
 		anchor.Translate(move, Space.Self);
+	}
+	
+	private void HandleRotate(float value)
+	{
+		anchor.RotateAround(transform.position, new Vector3(0, value, 0), rotateSpeed * Time.deltaTime);
+	}
+	
+	private void HandleVertical(float value)
+	{
+		var verticalMovement = new Vector3(0, value, 0) * verticalSpeed * Time.deltaTime;
+		anchor.Translate(verticalMovement, Space.Self);
 	}
 	
 	private void HandleMouseMovement(Vector2 value)
@@ -71,14 +88,9 @@ public class CameraMove : InputBehaviour
 		}
 	}
 
-	private void HandleRotate(float value)
-	{
-		anchor.RotateAround(transform.position, new Vector3(0, value, 0), rotateSpeed * Time.deltaTime);
-	}
-
 	private void HandleScrollWheel(Vector2 value)
 	{
-		if (unitSelection.selectedObject != null) return;
+		if (unitSelection.HasSelectedUnits) return;
 		
 		var zoom = new Vector3(0, 0, value.y) * zoomSpeed * Time.deltaTime;
 		transform.Translate(zoom, Space.Self);

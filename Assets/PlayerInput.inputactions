@@ -16,7 +16,7 @@
                 },
                 {
                     "name": "LeftClick",
-                    "type": "PassThrough",
+                    "type": "Button",
                     "id": "2c10cc46-c20d-48c8-87a6-379d0937e3a5",
                     "expectedControlType": "Button",
                     "processors": "",
@@ -25,7 +25,7 @@
                 },
                 {
                     "name": "RightClick",
-                    "type": "PassThrough",
+                    "type": "Button",
                     "id": "3d718b93-27fc-458e-baf7-bf5e56bb1fea",
                     "expectedControlType": "Button",
                     "processors": "",
@@ -63,6 +63,24 @@
                     "name": "MouseMovement",
                     "type": "PassThrough",
                     "id": "be95e6e8-179c-4c26-8520-1edf8f08fef6",
+                    "expectedControlType": "Vector2",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "Vertical",
+                    "type": "Value",
+                    "id": "a9e628db-06d9-444f-a8da-59b6ef21237f",
+                    "expectedControlType": "Axis",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": true
+                },
+                {
+                    "name": "MousePosition",
+                    "type": "PassThrough",
+                    "id": "9760e49a-e521-4851-b0f9-75228c11bd37",
                     "expectedControlType": "Vector2",
                     "processors": "",
                     "interactions": "",
@@ -205,7 +223,7 @@
                 {
                     "name": "negative",
                     "id": "8ea3fe7b-8b99-4c20-a106-78e90e35ee5d",
-                    "path": "<Keyboard>/q",
+                    "path": "<Keyboard>/r",
                     "interactions": "",
                     "processors": "",
                     "groups": "",
@@ -216,7 +234,7 @@
                 {
                     "name": "positive",
                     "id": "da160a7a-799d-41b1-b76e-524d262980aa",
-                    "path": "<Keyboard>/e",
+                    "path": "<Keyboard>/f",
                     "interactions": "",
                     "processors": "",
                     "groups": "",
@@ -254,6 +272,50 @@
                     "processors": "",
                     "groups": "",
                     "action": "MouseMovement",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "1D Axis",
+                    "id": "dbe1f605-1e2b-4524-8134-d3e4747570ea",
+                    "path": "1DAxis",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Vertical",
+                    "isComposite": true,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "positive",
+                    "id": "f785c769-ac80-4e5f-a77a-e529f9c20fa7",
+                    "path": "<Keyboard>/e",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Vertical",
+                    "isComposite": false,
+                    "isPartOfComposite": true
+                },
+                {
+                    "name": "negative",
+                    "id": "fa3e934a-3dcd-44d9-a8e7-7999bf6462f4",
+                    "path": "<Keyboard>/q",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Vertical",
+                    "isComposite": false,
+                    "isPartOfComposite": true
+                },
+                {
+                    "name": "",
+                    "id": "b247003b-6d32-49ff-af07-cd61fb671a8e",
+                    "path": "<Mouse>/position",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "MousePosition",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }
