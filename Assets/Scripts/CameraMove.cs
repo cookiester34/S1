@@ -1,6 +1,6 @@
 using UnityEngine;
 
-[RequireComponent(typeof(UnitSelection))]
+// [RequireComponent(typeof(UnitSelection))]
 public class CameraMove : InputBehaviour
 {
 	[SerializeField]
@@ -24,11 +24,11 @@ public class CameraMove : InputBehaviour
 	
 	private bool canRotateXAxis = false;
 	
-	private UnitSelection unitSelection;
+	private UnitSelection2 unitSelection;
 
 	protected override void OnAwake()
 	{
-		unitSelection = GetComponent<UnitSelection>();
+		unitSelection = GetComponent<UnitSelection2>();
 	}
 
 	protected override void SetupInput()
