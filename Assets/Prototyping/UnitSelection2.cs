@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
@@ -101,13 +102,12 @@ public class UnitSelection2 : InputBehaviour
 	{
 		inputHandler.AddInputAction("LeftClick", HandleLeftClick, HandleLeftClickUp);
 		inputHandler.AddInputAction("RightClick", HandleRightClick);
-		inputHandler.AddInputAction("ToggleSelectionSide", () => selectFarSide = !selectFarSide);
+		inputHandler.AddInputAction("ToggleSelectionSide", () => selectFarSide = true, () => selectFarSide = false);
 		inputHandler.AddInputAction<Vector2>("ScrollWheel", HandleScrollWheel);
-		inputHandler.AddInputAction<Vector2>("MouseMovement", HandleMouseMovement);
 		inputHandler.AddInputAction<Vector2>("MousePosition", HandleMousePosition);
 	}
-	
-	private void HandleMouseMovement(Vector2 value)
+
+	private void Update()
 	{
 		if (IsSelecting)
 		{
