@@ -35,6 +35,8 @@ namespace S1.Runtime.UnitManagement
 		
 		public static void SetSelectedUnits(HashSet<Unit> units) => SelectedUnits = units;
 
+		public static void AddSelectedUnit(Unit unit) => SelectedUnits.Add(unit);
+
 		public static void ClearSelectedUnits() => SelectedUnits.Clear();
 		
 		public static void RemoveUnit(Unit unit) => SelectedUnits.Remove(unit);
