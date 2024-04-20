@@ -17,7 +17,6 @@ namespace S1.Runtime.Utils
 				if (playerInput != null)
 				{
 					InputHandler.Setup(playerInput);
-					SetupInput();
 				}
 				else
 				{
@@ -25,6 +24,7 @@ namespace S1.Runtime.Utils
 				}
 			}
 			
+			SetupInput();
 			OnAwake();
 		}
 

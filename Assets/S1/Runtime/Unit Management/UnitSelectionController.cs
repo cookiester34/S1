@@ -151,16 +151,18 @@ namespace S1.Runtime.UnitManagement
 
 		private void HandleLeftClick()
 		{
-			isSelecting = true;
-			mouseSelectionStartPosition = mousePosition;
-
 			if (UnitSelectionManager.HasSelectedUnits)
 			{
 				foreach (var unit in UnitSelectionManager.SelectedUnits)
 				{
 					unit.Move(unit.UnitPosition + offset);
 				}
+				
+				return;
 			}
+			
+			isSelecting = true;
+			mouseSelectionStartPosition = mousePosition;
 
 			UnitSelectionManager.ClearSelectedUnits();
 			previewSelectedUnits.Clear();
