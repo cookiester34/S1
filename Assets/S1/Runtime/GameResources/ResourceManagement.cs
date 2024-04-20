@@ -1,4 +1,4 @@
-﻿namespace Game.Runtime.Resources
+﻿namespace Game.Runtime.GameResources
 {
 	public class ResourceManagement
 	{
