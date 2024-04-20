@@ -5,14 +5,14 @@ using UnityEngine.InputSystem;
 [RequireComponent(typeof(PlayerInput))]
 public abstract class InputBehaviour : MonoBehaviour
 {
-	protected InputHandler inputHandler;
+	protected InputHandlerPrototype inputHandlerPrototype;
 
 	private void Awake()
 	{
 		var playerInput = GetComponent<PlayerInput>();
 		if (playerInput != null)
 		{
-			inputHandler = new InputHandler(playerInput);
+			inputHandlerPrototype = new InputHandlerPrototype(playerInput);
 			SetupInput();
 		}
 		else

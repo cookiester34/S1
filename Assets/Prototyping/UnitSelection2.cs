@@ -99,11 +99,11 @@ public class UnitSelection2 : InputBehaviour
 
 	protected override void SetupInput()
 	{
-		inputHandler.AddInputAction("LeftClick", HandleLeftClick, HandleLeftClickUp);
-		inputHandler.AddInputAction("RightClick", HandleRightClick);
-		inputHandler.AddInputAction("ToggleSelectionSide", () => selectFarSide = true, () => selectFarSide = false);
-		inputHandler.AddInputAction<Vector2>("ScrollWheel", HandleScrollWheel);
-		inputHandler.AddInputAction<Vector2>("MousePosition", HandleMousePosition);
+		inputHandlerPrototype.AddInputAction("LeftClick", HandleLeftClick, HandleLeftClickUp);
+		inputHandlerPrototype.AddInputAction("RightClick", HandleRightClick);
+		inputHandlerPrototype.AddInputAction("ToggleSelectionSide", () => selectFarSide = true, () => selectFarSide = false);
+		inputHandlerPrototype.AddInputAction<Vector2>("ScrollWheel", HandleScrollWheel);
+		inputHandlerPrototype.AddInputAction<Vector2>("MousePosition", HandleMousePosition);
 	}
 
 	private void Update()

@@ -1,12 +1,31 @@
 {
     "name": "S1.Runtime",
-    "rootNamespace": "",
+    "rootNamespace": "S1.Runtime",
     "references": [
         "GUID:75469ad4d38634e559750d17036d5f7c"
     ],
     "includePlatforms": [
+        "Android",
+        "Editor",
+        "EmbeddedLinux",
+        "GameCoreScarlett",
+        "GameCoreXboxOne",
+        "iOS",
+        "LinuxStandalone64",
+        "CloudRendering",
+        "macOSStandalone",
+        "PS4",
+        "PS5",
+        "QNX",
+        "Stadia",
+        "Switch",
+        "tvOS",
+        "WSA",
+        "VisionOS",
+        "WebGL",
         "WindowsStandalone32",
-        "WindowsStandalone64"
+        "WindowsStandalone64",
+        "XboxOne"
     ],
     "excludePlatforms": [],
     "allowUnsafeCode": false,

@@ -33,14 +33,14 @@ public class CameraMove : InputBehaviour
 
 	protected override void SetupInput()
 	{
-		inputHandler.AddInputAction("MiddleClick", () => canRotateXAxis = true, () => canRotateXAxis = false);
-		inputHandler.AddInputAction<Vector2>("ScrollWheel", HandleScrollWheel);
-		inputHandler.AddInputAction<Vector2>("MouseMovement", HandleMouseMovement);
+		inputHandlerPrototype.AddInputAction("MiddleClick", () => canRotateXAxis = true, () => canRotateXAxis = false);
+		inputHandlerPrototype.AddInputAction<Vector2>("ScrollWheel", HandleScrollWheel);
+		inputHandlerPrototype.AddInputAction<Vector2>("MouseMovement", HandleMouseMovement);
 
 		
-		inputHandler.AddInputAction<Vector2>("Move", out moveHandler);
-		inputHandler.AddInputAction<float>("Rotate", out rotateHandler);
-		inputHandler.AddInputAction<float>("Vertical", out verticalHandler);
+		inputHandlerPrototype.AddInputAction<Vector2>("Move", out moveHandler);
+		inputHandlerPrototype.AddInputAction<float>("Rotate", out rotateHandler);
+		inputHandlerPrototype.AddInputAction<float>("Vertical", out verticalHandler);
 	}
 
 	private void Update()

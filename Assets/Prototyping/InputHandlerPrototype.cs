@@ -2,12 +2,12 @@
 using System.Collections.Generic;
 using UnityEngine.InputSystem;
 
-public class InputHandler
+public class InputHandlerPrototype
 {
 	private PlayerInput playerInput;
 	private Dictionary<string, AbstractInputHandler> inputActions = new();
 	
-	public InputHandler(PlayerInput playerInput)
+	public InputHandlerPrototype(PlayerInput playerInput)
 	{
 		this.playerInput = playerInput;
 	}
