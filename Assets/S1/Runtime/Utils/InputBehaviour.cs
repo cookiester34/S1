@@ -6,7 +6,9 @@ using UnityEngine.InputSystem;
 namespace S1.Runtime.Utils
 {
 	[RequireComponent(typeof(PlayerInput))]
-	/// Use this class to create input behaviours that require the use of the InputHandler
+	// Use this class to create input behaviours that require the use of the InputHandler
+	// It makes sure that the input handler is setup and disposed correctly.
+	// Should only be used for input that is used throughout the entire game.
 	public abstract class InputBehaviour : MonoBehaviour
 	{
 		private void Awake()
@@ -24,6 +26,7 @@ namespace S1.Runtime.Utils
 				}
 			}
 			
+			InputHandler.RegisterScriptUsage(this);
 			SetupInput();
 			OnAwake();
 		}
@@ -31,5 +34,10 @@ namespace S1.Runtime.Utils
 		protected virtual void OnAwake(){}
 		
 		protected abstract void SetupInput();
+
+		private void OnDestroy()
+		{
+			InputHandler.DisposeScriptUsage(this);
+		}
 	}
 }

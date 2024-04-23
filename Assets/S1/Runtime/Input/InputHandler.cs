@@ -8,12 +8,37 @@ namespace S1.Runtime.Input
 	{
 		private static PlayerInput playerInput;
 		private static readonly Dictionary<string, AbstractInputHandler> inputActions = new();
+		private static readonly HashSet<object> scriptsUsingInput = new();
 		
 		public static bool IsSetup => playerInput != null;
 		
 		public static void Setup(PlayerInput playerInput)
 		{
 			InputHandler.playerInput ??= playerInput;
+		}
+
+		/// <summary>
+		/// Register a script to use the input handler
+		/// </summary>
+		/// <param name="script"></param>
+		public static void RegisterScriptUsage(object script)
+		{
+			scriptsUsingInput.Add(script);
+		}
+		
+		/// <summary>
+		/// We remove a script from the list of scripts using the input handler
+		/// When the list is empty we dispose the input handler
+		/// </summary>
+		/// <param name="script"></param>
+		public static void DisposeScriptUsage(object script)
+		{
+			scriptsUsingInput.Remove(script);
+			
+			if (scriptsUsingInput.Count == 0)
+			{
+				Dispose();
+			}
 		}
 
 		public static bool TryGetInputAction(string actionName, out AbstractInputHandler inputHandler)
@@ -25,28 +50,6 @@ namespace S1.Runtime.Input
 		{
 			if (TryAddInputAction<T>(actionName, out inputHandlerOfType))
 			{
-				return;
-			}
-			throw new Exception("Failed to add input action, action already exists");
-		}
-
-		public static void AddInputAction<T>(string actionName, Action<T> onPerformed, Action onCancel = null) where T : struct
-		{
-			if (TryAddInputAction<T>(actionName, out var inputHandlerOfType))
-			{
-				inputHandlerOfType.OnPerformed += onPerformed;
-				inputHandlerOfType.OnCanceled += onCancel;
-				return;
-			}
-			throw new Exception("Failed to add input action, action already exists");
-		}
-
-		public static void AddInputAction(string actionName, Action onPerformed, Action onCancel = null)
-		{
-			if (TryAddInputAction(actionName, out var inputHandlerOfType))
-			{
-				inputHandlerOfType.OnPerformed += onPerformed;
-				inputHandlerOfType.OnCanceled += onCancel;
 				return;
 			}
 			throw new Exception("Failed to add input action, action already exists");
@@ -98,6 +101,48 @@ namespace S1.Runtime.Input
 			}
 
 			return true;
+		}
+		
+		
+		/// <summary>
+		/// Should only be used by the InputBehaviour class
+		/// Unless you register the class and unregister it when it's destroyed
+		/// Actions will not be disposed until all scripts using the input handler are destroyed
+		/// </summary>
+		/// <param name="actionName"></param>
+		/// <param name="onPerformed"></param>
+		/// <param name="onCancel"></param>
+		/// <typeparam name="T"></typeparam>
+		/// <exception cref="Exception"></exception>
+		public static void AddInputAction<T>(string actionName, Action<T> onPerformed, Action onCancel = null) where T : struct
+		{
+			if (TryAddInputAction<T>(actionName, out var inputHandlerOfType))
+			{
+				inputHandlerOfType.OnPerformed += onPerformed;
+				inputHandlerOfType.OnCanceled += onCancel;
+				return;
+			}
+			throw new Exception("Failed to add input action, action already exists");
+		}
+
+		/// <summary>
+		/// Should only be used by the InputBehaviour class
+		/// Unless you register the class and unregister it when it's destroyed
+		/// Actions will not be disposed until all scripts using the input handler are destroyed
+		/// </summary>
+		/// <param name="actionName"></param>
+		/// <param name="onPerformed"></param>
+		/// <param name="onCancel"></param>
+		/// <exception cref="Exception"></exception>
+		public static void AddInputAction(string actionName, Action onPerformed, Action onCancel = null)
+		{
+			if (TryAddInputAction(actionName, out var inputHandlerOfType))
+			{
+				inputHandlerOfType.OnPerformed += onPerformed;
+				inputHandlerOfType.OnCanceled += onCancel;
+				return;
+			}
+			throw new Exception("Failed to add input action, action already exists");
 		}
 
 		public static void Dispose()

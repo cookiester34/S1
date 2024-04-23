@@ -26,4 +26,9 @@ public abstract class InputBehaviour : MonoBehaviour
 	protected virtual void OnAwake(){}
 		
 	protected abstract void SetupInput();
+
+	private void OnDestroy()
+	{
+		
+	}
 }
